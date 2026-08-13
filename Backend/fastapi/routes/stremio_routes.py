@@ -30,7 +30,7 @@ router = APIRouter(prefix="/stremio", tags=["Stremio Addon"])
 templates = Jinja2Templates(directory="Backend/fastapi/templates")
 
 #----- Addon configuration
-ADDON_NAME = "Telegram"
+ADDON_NAME = "HRCinevon"
 ADDON_VERSION = __version__
 PAGE_SIZE = 15
 
@@ -312,7 +312,7 @@ def format_stream_details(filename: str, quality: str, size: str, is_split: bool
     try:
         parsed = PTN.parse(filename)
     except Exception:
-        return (f"Telegram {quality}", f"📁 {filename}\n{size_emoji} {size}")
+        return (f"HRCinevon {quality}", f"📁 {filename}\n{size_emoji} {size}")
 
     codec_parts = []
     if parsed.get("codec"):
@@ -321,14 +321,14 @@ def format_stream_details(filename: str, quality: str, size: str, is_split: bool
         codec_parts.append(f"🌈 {parsed.get('bitDepth')}bit")
     if parsed.get("audio"):
         codec_parts.append(f"🔊 {parsed.get('audio')}")
-    if parsed.get("encoder"):
-        codec_parts.append(f"👤 {parsed.get('encoder')}")
+    # if parsed.get("encoder"):
+        # codec_parts.append(f"👤 {parsed.get('encoder')}")
 
     codec_info = " ".join(codec_parts) if codec_parts else ""
 
     resolution = parsed.get("resolution", quality)
     quality_type = parsed.get("quality", "")
-    stream_name = f"Telegram {resolution} {quality_type}".strip()
+    stream_name = f"{resolution} {quality_type}".strip()
 
     stream_title_parts = [
         f"📁 {filename}",

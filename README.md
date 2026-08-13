@@ -1,5 +1,5 @@
 ---
-title: Telegram Stremio
+title: HRCinevon
 emoji: 🎬
 colorFrom: blue
 colorTo: purple
@@ -13,7 +13,7 @@ pinned: false
 </p>
 
 <p align="center">
-  A powerful, self-hosted <b>Telegram Stremio Media Server</b> built with <b>FastAPI</b>, <b>MongoDB</b>, and <b>PyroFork</b> — turn your Telegram channels into a private streaming library you watch in <b>Stremio</b> / <b>Nuvio</b>.
+  A powerful, self-hosted <b>HRCinevon Media Server</b> built with <b>FastAPI</b>, <b>MongoDB</b>, and <b>PyroFork</b> — turn your Telegram channels into a private streaming library you watch in <b>Stremio</b> / <b>Nuvio</b>.
 </p>
 
 <p align="center">
