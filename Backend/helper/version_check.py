@@ -54,7 +54,7 @@ async def check_upstream_version(force: bool = False) -> dict:
         if not force and _state["checked_at"] and now - _state["checked_at"] < 300:
             return dict(_state)
         settings = SettingsManager.current()
-        repo_url = settings.upstream_repo or "https://github.com/weebzone/Telegram-Stremio"
+        repo_url = settings.upstream_repo or "https://github.com/weebzone/HRCinevon"
         branch = settings.upstream_branch or "master"
         parsed = _parse_repo(repo_url)
         if not parsed:

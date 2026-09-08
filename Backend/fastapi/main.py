@@ -141,8 +141,8 @@ from Backend.pyrofork.bot import work_loads_summary
 templates = Jinja2Templates(directory="Backend/fastapi/templates")
 
 app = FastAPI(
-    title="Telegram Stremio Media Server",
-    description="A powerful, self-hosted Telegram Stremio Media Server built with FastAPI, MongoDB, and PyroFork seamlessly integrated with Stremio for automated media streaming and discovery.",
+    title="HRCinevon Media Server",
+    description="A powerful, self-hosted HRCinevon Media Server built with FastAPI, MongoDB, and PyroFork seamlessly integrated with Stremio for automated media streaming and discovery.",
     version=__version__
 )
 
@@ -198,9 +198,9 @@ async def pwa_manifest(request: Request):
     theme = get_theme(theme_name, style_name)
     return JSONResponse(
         {
-            "name": "Telegram Stremio",
-            "short_name": "TG Stremio",
-            "description": "Telegram Stremio media management",
+            "name": "HRCinevon",
+            "short_name": "HRCinevon",
+            "description": "HRCinevon media management",
             "start_url": "/",
             "scope": "/",
             "display": "standalone",
@@ -746,7 +746,7 @@ async def admin_backup_export(_: bool = Depends(require_auth)):
     data = await export_config_api()
     return JSONResponse(
         content=data,
-        headers={"Content-Disposition": 'attachment; filename="telegram-stremio-backup.json"'},
+        headers={"Content-Disposition": 'attachment; filename="HRCinevon-backup.json"'},
     )
 
 @app.post("/api/admin/backup/import")

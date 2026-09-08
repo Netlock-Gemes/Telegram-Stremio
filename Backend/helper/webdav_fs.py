@@ -1,5 +1,5 @@
 """
-Virtual filesystem for WebDAV backed by Telegram-Stremio MongoDB.
+Virtual filesystem for WebDAV backed by HRCinevon MongoDB.
 
 Layout (stable paths):
 

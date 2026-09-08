@@ -77,8 +77,8 @@ def normalize_package_name(name: str) -> str:
     """PEP 503 normalization: lowercase, runs of -_. collapse to a single '-'.
 
     uv (like pip/PyPI) normalizes package names before writing uv.lock, so
-    a pyproject.toml name of "Telegram-Stremio" or "telegram_stremio" ends
-    up as "telegram-stremio" in the lockfile. We must normalize the same
+    a pyproject.toml name of "HRCinevon" or "telegram_stremio" ends
+    up as "HRCinevon" in the lockfile. We must normalize the same
     way before searching, or the lookup silently misses.
     """
     return re.sub(r"[-_.]+", "-", name).lower()

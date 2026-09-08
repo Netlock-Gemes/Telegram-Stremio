@@ -29,7 +29,7 @@ _client_lock = asyncio.Lock()
 _HEADERS = {
     "Accept": "application/vnd.api+json",
     "Content-Type": "application/vnd.api+json",
-    "User-Agent": "Telegram-Stremio (+https://github.com/weebzone/Telegram-Stremio)",
+    "User-Agent": "HRCinevon (+https://github.com/weebzone/HRCinevon)",
 }
 
 
