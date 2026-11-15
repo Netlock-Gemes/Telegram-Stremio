@@ -203,6 +203,75 @@ async def edit_media_page(request: Request, tmdb_id: int, db_index: int, media_t
     return templates.TemplateResponse("media_edit.html", ctx)
 
 
+#----- In-site watch page: player plus the title's playable files (episodes for series)
+def _playable_files(entries) -> list:
+    files = []
+    for q in entries or []:
+        if not q.get("id"):
+            continue
+        files.append({
+            "id": q["id"],
+            "name": q.get("name") or "video",
+            "quality": q.get("quality") or "",
+            "size": q.get("size") or "",
+        })
+    return files
+
+
+async def watch_page(request: Request, tmdb_id: int, db_index: int, media_type: str, _: bool = Depends(require_auth)):
+    if media_type not in ("movie", "tv"):
+        raise HTTPException(status_code=404, detail="Unknown media type")
+    media = await db.get_document(media_type, tmdb_id, db_index)
+    if not media:
+        raise HTTPException(status_code=404, detail="Media not found")
+
+    watch = {
+        "type": media_type,
+        "tmdb_id": tmdb_id,
+        "db_index": db_index,
+        "title": media.get("title") or "Untitled",
+        "year": media.get("release_year") or "",
+        "backdrop": resolve_cover_url(media.get("backdrop")) or "",
+        "poster": resolve_cover_url(media.get("poster")) or "",
+    }
+    if media_type == "movie":
+        watch["files"] = _playable_files(media.get("telegram"))
+    else:
+        seasons = []
+        for season in sorted(media.get("seasons") or [], key=lambda x: x.get("season_number") or 0):
+            episodes = []
+            for ep in sorted(season.get("episodes") or [], key=lambda x: x.get("episode_number") or 0):
+                files = _playable_files(ep.get("telegram"))
+                if not files:
+                    continue
+                title = (ep.get("title") or "").strip()
+                number = ep.get("episode_number")
+                episodes.append({
+                    "n": number,
+                    "title": title if title and title.lower() != f"episode {number}" else f"Episode {number}",
+                    "overview": ep.get("overview") or "",
+                    "still": resolve_cover_url(ep.get("episode_backdrop")) or "",
+                    "released": str(ep.get("released") or "")[:10],
+                    "files": files,
+                })
+            if episodes:
+                seasons.append({"n": season.get("season_number") or 0, "episodes": episodes})
+        watch["seasons"] = seasons
+
+    api_tokens = await db.get_all_api_tokens()
+    ctx = _base_context(request)
+    ctx.update({
+        "current_user": get_current_user(request),
+        "media_type": media_type,
+        "tmdb_id": tmdb_id,
+        "db_index": db_index,
+        "media_details": media,
+        "watch": watch,
+        "api_token": api_tokens[0].get("token") if api_tokens else None,
+    })
+    return templates.TemplateResponse("watch.html", ctx)
+
+
 #----- Subscription management shell
 async def admin_subscriptions_page(request: Request, _: bool = Depends(require_auth)):
     ctx = _base_context(request)

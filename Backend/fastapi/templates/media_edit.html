@@ -111,6 +111,9 @@
   .file-name { font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .file-sub { font-size: .78rem; color: var(--text-sec); }
   .file-actions { display: flex; gap: .25rem; flex-shrink: 0; }
+  .icon-act.play { color: var(--primary); }
+  .icon-act.play:hover { background: color-mix(in srgb, var(--primary) 14%, transparent); color: var(--primary); }
+  .hero-play { margin-top: .35rem; padding: .7rem 1.4rem; font-size: .95rem; text-decoration: none; box-shadow: 0 8px 24px -8px rgba(0,0,0,.6); }
   .q-badge { flex-shrink: 0; min-width: 3.4rem; text-align: center; padding: .2rem .5rem; border-radius: 8px; font-size: .74rem; font-weight: 600; background: var(--card-high); color: var(--text); }
   .q-badge.q-4k { background: color-mix(in srgb, var(--primary) 16%, transparent); color: var(--primary); }
   .q-badge.q-1080p { background: color-mix(in srgb, var(--info) 15%, transparent); color: var(--info); }
@@ -283,6 +286,33 @@
                     <div class="hero-genres">
                         {% for genre in media_details.genres[:6] %}<span class="hero-chip">{{ genre }}</span>{% endfor %}
                     </div>
+                    {% endif %}
+
+                    {% set watch_base = '/watch?tmdb_id=' ~ tmdb_id ~ '&db_index=' ~ db_index ~ '&media_type=' ~ media_type %}
+                    {% if (media_type == 'movie' and media_details.telegram) or (media_type == 'tv' and media_details.seasons) %}
+                    <a href="{{ watch_base }}&autoplay=1" id="hero-play" class="btn-ui btn-primary hero-play">
+                        <i class="fa-solid fa-play"></i><span id="hero-play-label">Play</span>
+                    </a>
+                    <script>
+                    (function () {
+                        try {
+                            const type = {{ media_type | tojson }}, id = {{ tmdb_id | tojson }};
+                            const read = (k) => JSON.parse(localStorage.getItem(k));
+                            const label = document.getElementById('hero-play-label');
+                            const two = (n) => String(n).padStart(2, '0');
+                            if (type === 'tv') {
+                                const last = read(`hrc:last:tv:${id}`);
+                                if (!last) return;
+                                const pos = read(`hrc:pos:tv:${id}:${last.s}:${last.e}`);
+                                if (pos && !pos.done && pos.t > 15) label.textContent = `Resume S${two(last.s)}E${two(last.e)}`;
+                                else if (pos && pos.done) label.textContent = 'Play next episode';
+                            } else {
+                                const pos = read(`hrc:pos:movie:${id}`);
+                                if (pos && !pos.done && pos.t > 15) label.textContent = 'Resume';
+                            }
+                        } catch (e) { /* storage blocked: plain Play */ }
+                    })();
+                    </script>
                     {% endif %}
                 </div>
             </div>
@@ -515,6 +545,7 @@
                     <p class="file-sub">{{ quality.size }}{% if quality.parts %} · {{ quality.parts|length }} parts{% endif %}</p>
                 </div>
                 <div class="file-actions">
+                    <a class="icon-act play" href="{{ watch_base }}&f={{ quality.id|urlencode }}&autoplay=1" title="Play {{ quality.quality }}" aria-label="Play {{ quality.quality }}"><i class="fa-solid fa-play"></i></a>
                     <button type="button" class="icon-act" data-id="{{ quality.id }}" data-name="{{ quality.name }}" onclick="copyStreamLink(this.dataset.id, this.dataset.name)" title="Copy stream link" aria-label="Copy stream link"><i class="fa-solid fa-link"></i></button>
                     <button type="button" class="icon-act" data-id="{{ quality.id }}" data-q="{{ quality.quality }}" onclick="runSpeedTest(this.dataset.id, 'movie', this.dataset.q)" title="Speed test" aria-label="Speed test"><i class="fa-solid fa-gauge-high"></i></button>
                     <button type="button" class="icon-act danger" data-id="{{ quality.id }}" onclick="deleteQuality(this.dataset.id, this)" title="Delete file" aria-label="Delete file"><i class="fa-solid fa-trash-can"></i></button>
@@ -580,6 +611,7 @@
                     <p class="file-sub">{{ quality.size }}{% if quality.parts %} · {{ quality.parts|length }} parts{% endif %}</p>
                 </div>
                 <div class="file-actions">
+                    <a class="icon-act play" href="{{ watch_base }}&s={{ season.season_number }}&e={{ episode.episode_number }}&f={{ quality.id|urlencode }}&autoplay=1" title="Play {{ quality.quality }}" aria-label="Play S{{ season.season_number }}E{{ episode.episode_number }} {{ quality.quality }}"><i class="fa-solid fa-play"></i></a>
                     <button type="button" class="icon-act" data-id="{{ quality.id }}" data-name="{{ quality.name }}" onclick="copyStreamLink(this.dataset.id, this.dataset.name)" title="Copy stream link" aria-label="Copy stream link"><i class="fa-solid fa-link"></i></button>
                     <button type="button" class="icon-act" data-id="{{ quality.id }}" data-q="{{ quality.quality }}" onclick="runSpeedTest(this.dataset.id, 'tv', this.dataset.q)" title="Speed test" aria-label="Speed test"><i class="fa-solid fa-gauge-high"></i></button>
                     <button type="button" class="icon-act danger" data-id="{{ quality.id }}" onclick="deleteTVQuality({{ season.season_number }}, {{ episode.episode_number }}, this.dataset.id, this)" title="Delete file" aria-label="Delete file"><i class="fa-solid fa-trash-can"></i></button>

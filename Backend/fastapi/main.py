@@ -136,6 +136,7 @@ from Backend.fastapi.routes.template_routes import (
     settings_page,
     set_theme,
     tools_page,
+    watch_page,
 )
 from Backend.fastapi.security.credentials import require_auth
 from Backend.pyrofork.bot import work_loads_summary
@@ -248,7 +249,9 @@ async def service_worker():
     js = (
         "self.addEventListener('install',e=>self.skipWaiting());"
         "self.addEventListener('activate',e=>e.waitUntil(clients.claim()));"
-        "self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));"
+        "self.addEventListener('fetch',e=>{const p=new URL(e.request.url).pathname;"
+        "if(p.startsWith('/play/')||p.startsWith('/dl/'))return;"
+        "e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});"
     )
     return Response(
         content=js,
@@ -303,6 +306,10 @@ async def custom_catalogs(request: Request, _: bool = Depends(require_auth)):
 @app.get("/media/edit", response_class=HTMLResponse)
 async def edit_media(request: Request, tmdb_id: int, db_index: int, media_type: str, _: bool = Depends(require_auth)):
     return await edit_media_page(request, tmdb_id, db_index, media_type, _)
+
+@app.get("/watch", response_class=HTMLResponse)
+async def watch(request: Request, tmdb_id: int, db_index: int, media_type: str, _: bool = Depends(require_auth)):
+    return await watch_page(request, tmdb_id, db_index, media_type, _)
 
 @app.get("/api/media/list")
 async def list_media(

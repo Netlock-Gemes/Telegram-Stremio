@@ -13,6 +13,7 @@ from fastapi.responses import Response as PlainResponse
 from fastapi.responses import StreamingResponse
 
 from Backend import db
+from Backend.fastapi.security.credentials import get_current_user, require_auth
 from Backend.fastapi.security.tokens import verify_token
 from Backend.helper.bounded import BoundedDict
 from Backend.helper.analytics import client_ip_from, record_stream_start
@@ -288,6 +289,19 @@ async def stream_handler(request: Request, token: str, id: str, name: str, token
             client_ip_from(request),
             request.headers.get("user-agent", ""),
         ))
+    return await _dispatch_stream(request, token, id, token_data)
+
+
+#----- In-site web player: same streamers, authorised by the admin web session instead of an API token
+@router.get("/play/{id}/{name}")
+@router.head("/play/{id}/{name}")
+async def web_player_stream(request: Request, id: str, name: str, _: bool = Depends(require_auth)):
+    user = get_current_user(request) or "admin"
+    token_data = {"name": f"Web player ({user})", "is_admin": True, "limits": {}, "usage": {}}
+    return await _dispatch_stream(request, "", id, token_data)
+
+
+async def _dispatch_stream(request: Request, token: str, id: str, token_data: dict):
     decoded = await decode_string(id)
 
     if decoded.get("global"):

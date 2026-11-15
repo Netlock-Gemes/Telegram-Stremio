@@ -261,6 +261,8 @@
         const size = bytesToSize(qs.reduce((sum, q) => sum + sizeToBytes(q.size), 0));
         const href = `/media/edit?tmdb_id=${encodeURIComponent(item.tmdb_id)}&db_index=${encodeURIComponent(item.db_index)}&media_type=${encodeURIComponent(mediaType)}&page=${currentPage}${currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : ''}`;
         const meta = [year, size].filter(Boolean).join(' · ');
+        const watchHref = `/watch?tmdb_id=${encodeURIComponent(item.tmdb_id)}&db_index=${encodeURIComponent(item.db_index)}&media_type=${encodeURIComponent(mediaType)}&autoplay=1`;
+        const play = qs.length ? `<span class="m-play${Number(item.tmdb_id) < 0 ? ' is-lifted' : ''}"><a href="${watchHref}" aria-label="Play ${title}" title="Play"><i class="fa-solid fa-play"></i></a></span>` : '';
         return `
         <article class="m-card">
             <a href="${href}" class="m-poster" aria-label="Edit ${title}">
@@ -270,6 +272,7 @@
                 ${Number(item.tmdb_id) < 0 ? '<span class="m-custom"><i class="fa-solid fa-star"></i> Custom</span>' : ''}
                 ${mediaBadges(item)}
             </a>
+            ${play}
             <button onclick="deleteMedia(this)" data-tmdb-id="${escapeHtml(item.tmdb_id)}" data-db-index="${escapeHtml(item.db_index ?? '')}" data-title="${title}"
                     class="m-del" aria-label="Delete ${title}" title="Delete">
                 <i class="fa-solid fa-trash-can"></i>
@@ -967,5 +970,15 @@
     .m-custom { bottom: 6px; right: 6px; background: var(--primary); color: var(--on-primary); }
     .q-chip { position: static; font-size: .62rem; padding: 1px 6px; }
     .m-poster > div { z-index: 2; }
+    .m-play { position: absolute; z-index: 3; inset: 0 0 auto 0; aspect-ratio: 2 / 3; display: grid; place-items: center; pointer-events: none; }
+    .m-play a { pointer-events: auto; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 9999px; background: var(--primary); color: var(--on-primary); font-size: 1.05rem; box-shadow: 0 8px 22px rgba(0,0,0,.45); opacity: 0; transform: scale(.9); transition: opacity .18s var(--ease), transform .18s var(--ease); }
+    .m-play a i { margin-left: 3px; }
+    .m-card:hover .m-play a, .m-play a:focus-visible { opacity: 1; transform: none; }
+    .m-play a:active { transform: scale(.95); }
+    @media (hover: none) {
+        .m-play { place-items: end; padding: 6px; }
+        .m-play.is-lifted { padding-bottom: 32px; }
+        .m-play a { width: 34px; height: 34px; font-size: .78rem; opacity: 1; transform: none; }
+    }
 </style>
 {% endblock %}
