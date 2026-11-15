@@ -70,9 +70,13 @@
             </div>
             <button type="button" class="hp-time" data-act="remaining" aria-label="Switch between elapsed and remaining time"><span class="hp-now">0:00</span> <span class="hp-dur">/ 0:00</span></button>
             <div class="hp-right">
-              <div class="hp-speed-wrap">
-                <button type="button" class="hp-btn" data-act="speed" title="Playback speed" aria-label="Playback speed" aria-expanded="false">${icon("gauge", 20)}</button>
-                <ul class="hp-speeds" role="menu" hidden>
+              <div class="hp-menu-wrap hp-q-wrap" hidden>
+                <button type="button" class="hp-btn hp-qbtn" data-act="quality" title="Quality" aria-label="Quality" aria-haspopup="menu" aria-expanded="false"><span class="hp-qlabel"></span></button>
+                <ul class="hp-menu hp-qualities" role="menu" aria-label="Quality" hidden></ul>
+              </div>
+              <div class="hp-menu-wrap hp-speed-wrap">
+                <button type="button" class="hp-btn" data-act="speed" title="Playback speed" aria-label="Playback speed" aria-haspopup="menu" aria-expanded="false">${icon("gauge", 20)}</button>
+                <ul class="hp-menu hp-speeds" role="menu" aria-label="Playback speed" hidden>
                   ${SPEEDS.map((v) => `<li><button type="button" role="menuitemradio" data-speed="${v}" aria-checked="false">${v === 1 ? "Normal" : v + "×"}</button></li>`).join("")}
                 </ul>
               </div>
@@ -104,6 +108,12 @@
     const durEl = stage.querySelector(".hp-dur");
     const volRange = stage.querySelector(".hp-vol input");
     const speedsEl = stage.querySelector(".hp-speeds");
+    const qWrap = stage.querySelector(".hp-q-wrap");
+    const qMenu = stage.querySelector(".hp-qualities");
+    const qLabel = stage.querySelector(".hp-qlabel");
+    const menus = [speedsEl, qMenu];
+    const menuOpen = () => menus.some((m) => !m.hidden);
+    let onQuality = null;
     const failedEl = stage.querySelector(".hp-failed");
     const btn = (act) => stage.querySelector(`[data-act="${act}"]`);
 
@@ -124,7 +134,7 @@
     }
 
     function setControls(on) {
-      stage.classList.toggle("is-hidden", !on && playing() && speedsEl.hidden);
+      stage.classList.toggle("is-hidden", !on && playing() && !menuOpen());
     }
     function showControls() {
       setControls(true);
@@ -161,7 +171,20 @@
         screen.orientation?.lock?.("landscape").catch(() => {});
       } else video.webkitEnterFullscreen?.(); // iPhone only offers the system player
     }
-    function closeSpeeds() { speedsEl.hidden = true; btn("speed").setAttribute("aria-expanded", "false"); }
+    function closeSpeeds() {
+      menus.forEach((m) => (m.hidden = true));
+      stage.querySelectorAll("[aria-haspopup=menu]").forEach((b) => b.setAttribute("aria-expanded", "false"));
+    }
+    // Opens one menu (closing the other) and keeps it inside the player, however short the player is
+    function toggleMenu(menu, button) {
+      const opening = menu.hidden;
+      closeSpeeds();
+      if (!opening) return;
+      menu.hidden = false;
+      button.setAttribute("aria-expanded", "true");
+      const room = button.getBoundingClientRect().top - stage.getBoundingClientRect().top - 12;
+      menu.style.maxHeight = Math.max(room, 120) + "px";
+    }
 
     function paint() {
       const d = video.duration || 0;
@@ -302,7 +325,7 @@
     // A mouse or touch press shouldn't leave focus on a control: otherwise the next key press
     // makes the browser draw a focus outline on it. Keyboard (Tab) focus still shows as usual.
     stage.addEventListener("pointerup", (e) => {
-      if (e.target.closest(".hp-speeds")) return;
+      if (e.target.closest(".hp-menu")) return;
       setTimeout(() => {
         const active = document.activeElement;
         if (active && active !== stage && stage.contains(active)) stage.focus({ preventScroll: true });
@@ -346,10 +369,9 @@
       else if (act === "fwd") seekBy(SKIP);
       else if (act === "mute") video.muted = !video.muted;
       else if (act === "remaining") { remaining = !remaining; paint(); }
-      else if (act === "speed") {
-        speedsEl.hidden = !speedsEl.hidden;
-        b.setAttribute("aria-expanded", String(!speedsEl.hidden));
-      } else if (act === "pip") {
+      else if (act === "speed") toggleMenu(speedsEl, b);
+      else if (act === "quality") toggleMenu(qMenu, b);
+      else if (act === "pip") {
         (document.pictureInPictureElement ? document.exitPictureInPicture() : video.requestPictureInPicture())?.catch(() => {});
       } else if (act === "fs") toggleFullscreen();
       showControls();
@@ -361,6 +383,12 @@
       video.defaultPlaybackRate = video.playbackRate = v;
       remember("hrp:speed", String(v));
       closeSpeeds();
+    });
+    qMenu.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-quality]");
+      if (!b) return;
+      closeSpeeds();
+      if (b.getAttribute("aria-checked") !== "true") onQuality?.(b.dataset.quality);
     });
     volRange.addEventListener("input", () => changeVolume(Number(volRange.value)));
 
@@ -412,6 +440,18 @@
 
     return {
       video, stage, flash, load,
+      /** list: [{ id, label, detail }]; the button hides when there's nothing to choose between. */
+      setQualities(list, currentId, onPick) {
+        onQuality = onPick;
+        const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const cur = list.find((q) => q.id === currentId);
+        qLabel.textContent = cur ? cur.label : "";
+        const b = btn("quality");
+        b.title = b.ariaLabel = cur ? `Quality: ${cur.label}` : "Quality";
+        qMenu.innerHTML = list.map((q) =>
+          `<li><button type="button" role="menuitemradio" data-quality="${esc(q.id)}" aria-checked="${q.id === currentId}"><b>${esc(q.label)}</b>${q.detail ? `<span>${esc(q.detail)}</span>` : ""}</button></li>`).join("");
+        qWrap.hidden = list.length < 2;
+      },
       setFailedActions(html) { failedEl.querySelector(".hp-failed-actions").innerHTML = html; },
       destroy() { document.removeEventListener("keydown", onKey); document.removeEventListener("fullscreenchange", onFullscreen); },
     };

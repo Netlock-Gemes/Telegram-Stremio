@@ -3,7 +3,7 @@
 {% block title %}Watch {{ watch.title }} - HRCinevon{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="/static/player.css?v=3">
+<link rel="stylesheet" href="/static/player.css?v=4">
 <style>
   .w-back { display: inline-flex; align-items: center; gap: .5rem; font-size: .875rem; color: var(--text-sec); text-decoration: none; transition: color .15s var(--ease); }
   .w-back:hover { color: var(--text); }
@@ -18,17 +18,10 @@
   .w-restart { margin-left: .9rem; border: 0; background: none; padding: 0; color: var(--primary); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
   .w-block { margin-top: 1.75rem; }
-  .w-files { display: flex; flex-wrap: wrap; gap: .5rem; }
-  .w-file { display: inline-flex; align-items: center; gap: .55rem; min-width: 0; max-width: 100%; padding: .55rem .9rem; border-radius: 9999px; border: 1px solid var(--border); background: transparent; color: var(--text); font-size: .88rem; cursor: pointer; transition: border-color .15s var(--ease), background-color .15s var(--ease); }
-  .w-file:hover { background: var(--card-high); }
-  .w-file[aria-pressed="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
-  .w-file b { font-weight: 600; }
-  .w-file span { color: var(--text-sec); font-variant-numeric: tabular-nums; }
-  .w-file[aria-pressed="true"] span { color: inherit; opacity: .8; }
 
   .w-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
   .w-actions .btn-ghost { padding: .55rem 1rem; font-size: .88rem; text-decoration: none; }
-  .w-file-name { margin-top: .75rem; font-size: .8rem; color: var(--text-sec); overflow-wrap: anywhere; }
+  .w-file-name { margin-top: .4rem; font-size: .8rem; color: var(--text-sec); overflow-wrap: anywhere; }
 
   .w-seasons { margin-bottom: 1rem; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
   .w-seasons::-webkit-scrollbar { display: none; }
@@ -78,15 +71,10 @@
   <div class="min-w-0">
     <h1 class="w-title" id="w-title">{{ watch.title }}</h1>
     <p class="w-sub" id="w-sub"></p>
+    <p class="w-file-name" id="w-file-name"></p>
   </div>
   <div class="w-actions" id="w-actions"></div>
 </div>
-
-<section class="w-block" aria-labelledby="w-files-label">
-  <p class="section-label" id="w-files-label">Quality</p>
-  <div class="w-files" id="w-files" role="group" aria-labelledby="w-files-label"></div>
-  <p class="w-file-name" id="w-file-name"></p>
-</section>
 
 {% if media_type == 'tv' %}
 <section class="w-block" aria-labelledby="w-eps-label">
@@ -106,7 +94,7 @@
 {% endif %}
 
 {% if playable %}
-<script src="/static/player.js?v=3"></script>
+<script src="/static/player.js?v=4"></script>
 <script>
 (function () {
   const W = {{ watch | tojson }};
@@ -219,9 +207,11 @@
     });
     document.title = `${isTV ? epLabel(current) + " · " : ""}${W.title} - HRCinevon`;
 
-    const files = sortedFiles(current.files);
-    document.getElementById("w-files").innerHTML = files.map((f) =>
-      `<button type="button" class="w-file" data-id="${esc(f.id)}" aria-pressed="${f.id === file.id}"><b>${esc(f.quality || "Original")}</b>${f.size ? `<span>${esc(f.size)}</span>` : ""}</button>`).join("");
+    player.setQualities(
+      sortedFiles(current.files).map((f) => ({ id: f.id, label: f.quality || "Original", detail: f.size })),
+      file.id,
+      switchQuality,
+    );
     document.getElementById("w-file-name").textContent = file.name;
 
     const ext = externalUrl(file);
@@ -247,13 +237,14 @@
     catch { prompt("Copy this stream link:", url); }
   });
 
-  document.getElementById("w-files").addEventListener("click", (e) => {
-    const b = e.target.closest(".w-file");
-    if (!b || b.dataset.id === file.id) return;
+  // Quality is picked from the player's own menu; switching keeps the place and the play state
+  function switchQuality(id) {
+    const next = current.files.find((f) => f.id === id);
+    if (!next || next.id === file.id) return;
     const v = player.video;
     const wasPlaying = !v.paused;
     const at = v.currentTime;
-    file = current.files.find((f) => f.id === b.dataset.id);
+    file = next;
     store.set("hrc:quality", file.quality);
     pendingStart = at > 1 ? at : null;
     resumePlaying = wasPlaying;
@@ -262,7 +253,7 @@
     player.flash(file.quality || "Original");
     syncUrl();
     paintInfo();
-  });
+  }
 
   // ---- episodes
   let shownSeason = current.s;

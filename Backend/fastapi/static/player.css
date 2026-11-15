@@ -80,12 +80,27 @@
 .hp-vol input { width: 0; height: 4px; opacity: 0; cursor: pointer; accent-color: var(--hp-accent); transition: width .2s ease, opacity .2s ease; }
 .hp-vol:hover input, .hp-vol input:focus-visible { width: 80px; opacity: 1; }
 
-.hp-speed-wrap { position: relative; }
-.hp-speeds { position: absolute; right: 0; bottom: 48px; width: 128px; margin: 0; padding: 4px; list-style: none; border-radius: 6px; background: var(--card, #fff); color: var(--text, #111); box-shadow: 0 12px 32px rgba(0,0,0,.45); }
-.hp-speeds[hidden] { display: none; }
-.hp-speeds button { display: block; width: 100%; padding: 8px 10px; border: 0; border-radius: 4px; background: none; color: inherit; text-align: left; font-size: .82rem; font-variant-numeric: tabular-nums; cursor: pointer; }
-.hp-speeds button:hover { background: var(--card-high, #eee); }
-.hp-speeds button[aria-checked="true"] { background: var(--hp-accent); color: var(--hp-on-accent); }
+.hp-menu-wrap { position: relative; }
+.hp-menu-wrap[hidden] { display: none; }
+.hp-menu { position: absolute; right: 0; bottom: 48px; width: 128px; margin: 0; padding: 4px; list-style: none; overflow-y: auto; overscroll-behavior: contain; border-radius: 6px; background: var(--card, #fff); color: var(--text, #111); box-shadow: 0 12px 32px rgba(0,0,0,.45); }
+.hp-menu[hidden] { display: none; }
+.hp-menu button { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; width: 100%; padding: 8px 10px; border: 0; border-radius: 4px; background: none; color: inherit; text-align: left; font-size: .82rem; font-variant-numeric: tabular-nums; cursor: pointer; white-space: nowrap; }
+.hp-menu button:hover { background: var(--card-high, #eee); }
+.hp-menu button[aria-checked="true"] { background: var(--hp-accent); color: var(--hp-on-accent); }
+.hp-qualities { width: 176px; }
+.hp-qualities b { font-weight: 600; }
+.hp-qualities span { opacity: .7; }
+
+.hp-qbtn { width: auto; min-width: 44px; padding: 0 8px; }
+.hp-qlabel { font-size: .8rem; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+
+/* Phones: one row of controls. Skip by double-tapping; PiP is left to the system player. */
+@media (max-width: 479px) {
+  .hp-btn { width: 40px; height: 40px; }
+  .hp-qbtn { width: auto; min-width: 40px; padding: 0 6px; }
+  .hp-btn[data-act="pip"] { display: none; }
+  .hp-time { margin-left: 0; padding: 0 4px; }
+}
 
 .hp-failed { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; background: rgba(0,0,0,.88); }
 .hp-failed[hidden] { display: none; }
