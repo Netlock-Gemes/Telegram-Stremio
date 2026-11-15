@@ -299,6 +299,16 @@
     video.addEventListener("pointerleave", endHold);
     big.addEventListener("click", toggle);
 
+    // A mouse or touch press shouldn't leave focus on a control: otherwise the next key press
+    // makes the browser draw a focus outline on it. Keyboard (Tab) focus still shows as usual.
+    stage.addEventListener("pointerup", (e) => {
+      if (e.target.closest(".hp-speeds")) return;
+      setTimeout(() => {
+        const active = document.activeElement;
+        if (active && active !== stage && stage.contains(active)) stage.focus({ preventScroll: true });
+      }, 0);
+    });
+
     // ---- seek bar: drag shows the target, release seeks once
     seek.addEventListener("pointerdown", (e) => { seek.setPointerCapture(e.pointerId); drag = timeAt(e.clientX).time; seek.classList.add("is-drag"); paint(); showTip(e.clientX); });
     seek.addEventListener("pointermove", (e) => {

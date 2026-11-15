@@ -3,7 +3,7 @@
 {% block title %}Watch {{ watch.title }} - HRCinevon{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="/static/player.css?v=2">
+<link rel="stylesheet" href="/static/player.css?v=3">
 <style>
   .w-back { display: inline-flex; align-items: center; gap: .5rem; font-size: .875rem; color: var(--text-sec); text-decoration: none; transition: color .15s var(--ease); }
   .w-back:hover { color: var(--text); }
@@ -106,7 +106,7 @@
 {% endif %}
 
 {% if playable %}
-<script src="/static/player.js?v=2"></script>
+<script src="/static/player.js?v=3"></script>
 <script>
 (function () {
   const W = {{ watch | tojson }};
