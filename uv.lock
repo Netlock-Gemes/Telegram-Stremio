@@ -371,6 +371,65 @@ wheels = [
 ]
 
 [[package]]
+name = "hrcinevon"
+version = "5.3.4"
+source = { virtual = "." }
+dependencies = [
+    { name = "aiofiles" },
+    { name = "fastapi" },
+    { name = "guessit" },
+    { name = "httptools" },
+    { name = "httpx" },
+    { name = "itsdangerous" },
+    { name = "jinja2" },
+    { name = "motor" },
+    { name = "parse-torrent-title" },
+    { name = "pyrofork" },
+    { name = "python-dotenv" },
+    { name = "python-multipart" },
+    { name = "pytz" },
+    { name = "rapidfuzz" },
+    { name = "requests" },
+    { name = "tgcrypto" },
+    { name = "themoviedb" },
+    { name = "uvicorn" },
+    { name = "uvloop" },
+    { name = "zstandard" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "deptry" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiofiles", specifier = ">=24.1.0" },
+    { name = "fastapi", specifier = ">=0.115.12" },
+    { name = "guessit", specifier = ">=3.8.0" },
+    { name = "httptools", specifier = ">=0.8.0" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "itsdangerous", specifier = ">=2.2.0" },
+    { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "motor", specifier = ">=3.7.0" },
+    { name = "parse-torrent-title", specifier = ">=2.8.1" },
+    { name = "pyrofork", specifier = ">=2.3.61" },
+    { name = "python-dotenv", specifier = ">=1.1.0" },
+    { name = "python-multipart", specifier = ">=0.0.20" },
+    { name = "pytz", specifier = ">=2025.2" },
+    { name = "rapidfuzz", specifier = ">=3.14.5" },
+    { name = "requests", specifier = ">=2.32.3" },
+    { name = "tgcrypto", specifier = ">=1.2.5" },
+    { name = "themoviedb", specifier = ">=1.0.2" },
+    { name = "uvicorn", specifier = ">=0.34.2" },
+    { name = "uvloop", specifier = ">=0.22.1" },
+    { name = "zstandard", specifier = ">=0.25.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "deptry", specifier = ">=0.23.1" }]
+
+[[package]]
 name = "httpcore"
 version = "1.0.9"
 source = { registry = "https://pypi.org/simple" }
@@ -1073,65 +1132,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/ce/20/08dfcd9c983f6a6f4
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/0c/9d30a4ebeb6db2b25a841afbb80f6ef9a854fc3b41be131d249a977b4959/starlette-0.46.2-py3-none-any.whl", hash = "sha256:595633ce89f8ffa71a015caed34a5b2dc1c0cdb3f0f1fbd1e69339cf2abeec35", size = 72037, upload-time = "2025-04-13T13:56:16.21Z" },
 ]
-
-[[package]]
-name = "telegram-stremio"
-version = "5.0.5"
-source = { virtual = "." }
-dependencies = [
-    { name = "aiofiles" },
-    { name = "fastapi" },
-    { name = "guessit" },
-    { name = "httptools" },
-    { name = "httpx" },
-    { name = "itsdangerous" },
-    { name = "jinja2" },
-    { name = "motor" },
-    { name = "parse-torrent-title" },
-    { name = "pyrofork" },
-    { name = "python-dotenv" },
-    { name = "python-multipart" },
-    { name = "pytz" },
-    { name = "rapidfuzz" },
-    { name = "requests" },
-    { name = "tgcrypto" },
-    { name = "themoviedb" },
-    { name = "uvicorn" },
-    { name = "uvloop" },
-    { name = "zstandard" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "deptry" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiofiles", specifier = ">=24.1.0" },
-    { name = "fastapi", specifier = ">=0.115.12" },
-    { name = "guessit", specifier = ">=3.8.0" },
-    { name = "httptools", specifier = ">=0.8.0" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "itsdangerous", specifier = ">=2.2.0" },
-    { name = "jinja2", specifier = ">=3.1.6" },
-    { name = "motor", specifier = ">=3.7.0" },
-    { name = "parse-torrent-title", specifier = ">=2.8.1" },
-    { name = "pyrofork", specifier = ">=2.3.61" },
-    { name = "python-dotenv", specifier = ">=1.1.0" },
-    { name = "python-multipart", specifier = ">=0.0.20" },
-    { name = "pytz", specifier = ">=2025.2" },
-    { name = "rapidfuzz", specifier = ">=3.14.5" },
-    { name = "requests", specifier = ">=2.32.3" },
-    { name = "tgcrypto", specifier = ">=1.2.5" },
-    { name = "themoviedb", specifier = ">=1.0.2" },
-    { name = "uvicorn", specifier = ">=0.34.2" },
-    { name = "uvloop", specifier = ">=0.22.1" },
-    { name = "zstandard", specifier = ">=0.25.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [{ name = "deptry", specifier = ">=0.23.1" }]
 
 [[package]]
 name = "tgcrypto"
