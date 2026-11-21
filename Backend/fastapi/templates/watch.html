@@ -220,12 +220,13 @@
       acts.push(`<button type="button" class="btn-ghost" data-copy><i class="fa-solid fa-link"></i> Copy link</button>`);
       acts.push(`<a class="btn-ghost" href="vlc://${esc(ext)}"><i class="fa-solid fa-arrow-up-right-from-square"></i> VLC</a>`);
       if (android) acts.push(`<a class="btn-ghost" href="${esc(intent(ext, "com.mxtech.videoplayer.ad"))}"><i class="fa-solid fa-arrow-up-right-from-square"></i> MX Player</a>`);
+      if (android) acts.push(`<a class="btn-ghost" href="${esc(intent(ext, "com.mxtech.videoplayer.pro"))}"><i class="fa-solid fa-arrow-up-right-from-square"></i> MX Player Pro</a>`);
     }
     acts.push(`<a class="btn-ghost" href="${esc(streamUrl(file))}" download><i class="fa-solid fa-download"></i> Download</a>`);
     document.getElementById("w-actions").innerHTML = acts.join("");
 
     player.setFailedActions(ext
-      ? `<a href="vlc://${esc(ext)}">Open in VLC</a>` + (android ? `<a href="${esc(intent(ext, "com.mxtech.videoplayer.ad"))}">MX Player</a>` : "") + `<button type="button" data-copy>Copy link</button>`
+      ? `<a href="vlc://${esc(ext)}">Open in VLC</a>` + (android ? `<a href="${esc(intent(ext, "com.mxtech.videoplayer.ad"))}">MX Player</a><a href="${esc(intent(ext, "com.mxtech.videoplayer.pro"))}">MX Player Pro</a>` : "") + `<button type="button" data-copy>Copy link</button>`
       : `<a href="/admin/access">Create an API token to use other players</a>`);
   }
 
